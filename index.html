@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosmos — Galaxia & Corazón 3D Interactivo</title>
+  <meta name="description" content="Experiencia 3D inmersiva: viaja a través de un túnel de partículas, explora una galaxia espiral y descubre un corazón tridimensional." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       DESIGN TOKENS & RESET
+       ============================================================ */
+    :root {
+      --font-primary: 'Outfit', system-ui, sans-serif;
+      --clr-bg: #030014;
+      --clr-surface: rgba(255, 255, 255, 0.04);
+      --clr-surface-hover: rgba(255, 255, 255, 0.08);
+      --clr-border: rgba(255, 255, 255, 0.08);
+      --clr-text: #e2e0ff;
+      --clr-text-muted: rgba(226, 224, 255, 0.55);
+      --clr-accent: #7c3aed;
+      --clr-accent-light: #a78bfa;
+      --clr-accent-glow: rgba(124, 58, 237, 0.35);
+      --clr-pink: #ec4899;
+      --clr-cyan: #06b6d4;
+      --radius-lg: 1.25rem;
+      --radius-xl: 1.75rem;
+      --shadow-glow: 0 0 80px var(--clr-accent-glow), 0 0 160px rgba(124,58,237,0.12);
+      --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-primary);
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       LANDING PAGE
+       ============================================================ */
+    #landing {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--clr-bg);
+      transition: opacity 0.8s var(--transition-smooth), transform 0.8s var(--transition-smooth);
+    }
+
+    #landing.hide {
+      opacity: 0;
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+
+    /* Animated background blobs */
+    .landing-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .landing-bg .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.35;
+      animation: blobFloat 12s ease-in-out infinite alternate;
+    }
+    .blob--1 {
+      width: 500px; height: 500px;
+      background: var(--clr-accent);
+      top: -10%; left: -8%;
+      animation-delay: 0s;
+    }
+    .blob--2 {
+      width: 400px; height: 400px;
+      background: var(--clr-pink);
+      bottom: -12%; right: -6%;
+      animation-delay: -4s;
+    }
+    .blob--3 {
+      width: 350px; height: 350px;
+      background: var(--clr-cyan);
+      top: 40%; left: 55%;
+      animation-delay: -8s;
+    }
+
+    @keyframes blobFloat {
+      0%   { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.15); }
+    }
+
+    /* Card */
+    .landing-card {
+      position: relative;
+      z-index: 2;
+      max-width: 480px;
+      width: 90%;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(40px) saturate(1.5);
+      -webkit-backdrop-filter: blur(40px) saturate(1.5);
+      box-shadow: var(--shadow-glow), 0 24px 48px rgba(0,0,0,0.45);
+      animation: cardEnter 1s var(--transition-smooth) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @keyframes cardEnter {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .landing-card h1 {
+      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--clr-text), var(--clr-accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .landing-card .subtitle {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--clr-text-muted);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* Illustration placeholder — animated rings */
+    .hero-illustration {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+    .hero-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid rgba(124, 58, 237, 0.25);
+      border-radius: 50%;
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+    .hero-ring:nth-child(2) {
+      inset: 15px;
+      border-color: rgba(236, 72, 153, 0.2);
+      animation-delay: -1s;
+    }
+    .hero-ring:nth-child(3) {
+      inset: 30px;
+      border-color: rgba(6, 182, 212, 0.2);
+      animation-delay: -2s;
+    }
+    .hero-ring-core {
+      position: absolute;
+      inset: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--clr-accent-light), transparent 70%);
+      animation: corePulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%      { transform: scale(1.08); opacity: 1; }
+    }
+    @keyframes corePulse {
+      0%   { opacity: 0.5; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* CTA Button */
+    #cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2.4rem;
+      font-family: var(--font-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--clr-accent), #9333ea);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s var(--transition-smooth), box-shadow 0.25s var(--transition-smooth);
+      box-shadow: 0 4px 24px var(--clr-accent-glow);
+    }
+    #cta::before {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: ctaSpin 3s linear infinite;
+    }
+    #cta:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 40px var(--clr-accent-glow);
+    }
+    #cta:active {
+      transform: scale(0.97);
+    }
+    #cta .cta-label { position: relative; z-index: 1; }
+    #cta .cta-arrow {
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+    #cta:hover .cta-arrow { transform: translateX(4px); }
+
+    @keyframes ctaSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       THREE.JS CANVAS
+       ============================================================ */
+    #three-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       HUD / INFO OVERLAY
+       ============================================================ */
+    #hud {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      padding: 0.6rem 1.4rem;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--clr-text-muted);
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 999px;
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      transition: opacity 0.6s var(--transition-smooth);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #hud.visible { opacity: 1; }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    #modal-root {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 0, 20, 0.6);
+      backdrop-filter: blur(8px);
+      animation: modalBgIn 0.3s ease forwards;
+    }
+    #modal-root.active {
+      display: flex;
+    }
+
+    @keyframes modalBgIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .modal-panel {
+      max-width: 400px;
+      width: 90%;
+      padding: 2rem 2rem 1.5rem;
+      background: rgba(20, 10, 50, 0.85);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(32px) saturate(1.4);
+      box-shadow: var(--shadow-glow);
+      animation: modalIn 0.4s var(--transition-smooth) forwards;
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    @keyframes modalIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-panel h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, var(--clr-accent-light), var(--clr-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .modal-panel p {
+      font-size: 0.9rem;
+      color: var(--clr-text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-panel .modal-meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .modal-panel .meta-tag {
+      padding: 0.3rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--clr-accent-light);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.08);
+    }
+
+    .modal-close-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.4rem;
+      font-family: var(--font-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--clr-text);
+      background: var(--clr-surface-hover);
+      border: 1px solid var(--clr-border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .modal-close-btn:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+    .modal-close-btn:active { transform: scale(0.97); }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .landing-card {
+        padding: 2rem 1.5rem;
+      }
+      .hero-illustration {
+        width: 110px;
+        height: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== LANDING ====== -->
+  <div id="landing">
+    <div class="landing-bg">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+      <div class="blob blob--3"></div>
+    </div>
+    <div class="landing-card">
+      <div class="hero-illustration" aria-hidden="true">
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-ring-core"></div>
+      </div>
+      <h1>Viaje al Cosmos</h1>
+      <p class="subtitle">Atraviesa un túnel de estrellas, contempla una galaxia espiral y descubre el corazón del universo.</p>
+      <button id="cta" type="button">
+        <span class="cta-label">Iniciar Viaje</span>
+        <span class="cta-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====== THREE.JS CANVAS (created by JS) ====== -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- ====== HUD ====== -->
+  <div id="hud">Haz clic en las burbujas orbitantes para explorar</div>
+
+  <!-- ====== MODAL ====== -->
+  <div id="modal-root"></div>
+
+  <!-- ====== MAIN SCRIPT ====== -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
